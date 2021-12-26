@@ -2,6 +2,7 @@
 
 Game::Game()
 {
+    this->resetGame();
 }
 
 Game::~Game()
@@ -44,7 +45,7 @@ Move Game::play(int col)
 
 bool Game::checkWin(int col, int row)
 {
-    return this->checkVertical(col, row) && this->checkHorizontal(col, row) && this->checkDiagonals(col, row);
+    return this->checkVertical(col, row) || this->checkHorizontal(col, row) || this->checkDiagonals(col, row);
 }
 
 bool Game::checkVertical(int col, int row)
@@ -145,4 +146,16 @@ bool Game::checkDiagonals(int col, int row)
     }
 
     return false;
+}
+
+void Game::resetGame()
+{
+    this->turn = turn::Yellow;
+    for (int i = 0; i < 7; i++)
+    {
+        for (int k = 0; k < 6; k++)
+        {
+            this->board[i][k] = chip::Empty;
+        }
+    }
 }

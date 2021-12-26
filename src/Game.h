@@ -31,4 +31,5 @@ public:
     ~Game();
     Move play(int col); //returns bool representing if player won
     bool checkWin(int col, int row);
+    void resetGame();
 };
