@@ -1,6 +1,6 @@
 # C++ Connect 4
 
-Local (same computer) game of connect 4 built using c++
+Local multiplayer (same computer) game of connect 4 built using c++
 
 ## Pre-requesites
 
