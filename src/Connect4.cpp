@@ -16,7 +16,7 @@ bool finished = false;
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(770, 660), "Connect 4");
+    sf::RenderWindow window(sf::VideoMode(770, 770), "Connect 4");
     window.setFramerateLimit(60);
 
     Game game;
@@ -47,8 +47,9 @@ int main()
 
 void drawBoard(sf::RenderWindow *window, Game *game)
 {
-    sf::RectangleShape bg(sf::Vector2f(window->getSize()));
+    sf::RectangleShape bg(sf::Vector2f(window->getSize().x, window->getSize().y - 100));
     bg.setFillColor(sf::Color::Blue);
+    bg.setPosition(0, 100);
     sf::CircleShape shape(45);
     shape.setFillColor(sf::Color::White);
 
@@ -57,9 +58,11 @@ void drawBoard(sf::RenderWindow *window, Game *game)
     for (int i = 0; i < 7; i++)
     {
         sf::IntRect colBox(sf::Vector2(110 * i, 0), sf::Vector2(110, (int)window->getSize().y));
+
         for (int k = 0; k < 6; k++)
         {
-            shape.setPosition(10 + 110 * i, window->getSize().y - 110 * (k + 1) + 10);
+            int chipX = 10 + 110 * i;
+            shape.setPosition(chipX, window->getSize().y - 110 * (k + 1) + 10);
 
             switch (game->board[i][k])
             {
@@ -75,20 +78,23 @@ void drawBoard(sf::RenderWindow *window, Game *game)
                     // preview the chip if hovering over a column
                     if ((game->board[i][0] == chip::Empty && k == 0) || (k > 0 && game->board[i][k - 1] != chip::Empty))
                     {
+                        sf::CircleShape previewChip(45);
+                        previewChip.setPosition(chipX, 10);
+
                         switch (game->turn)
                         {
                         case (turn::Yellow):
-                            shape.setFillColor(sf::Color(255, 253, 150));
+                            previewChip.setFillColor(sf::Color(255, 253, 150));
                             break;
                         case (turn::Red):
-                            shape.setFillColor(sf::Color(255, 105, 97));
+                            previewChip.setFillColor(sf::Color(255, 105, 97));
                             break;
                         }
+
+                        window->draw(previewChip);
                     }
-                    else
-                    {
-                        shape.setFillColor(sf::Color::White);
-                    }
+
+                    shape.setFillColor(sf::Color::White);
 
                     // checking for click
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clicked != sf::Mouse::isButtonPressed(sf::Mouse::Left))
