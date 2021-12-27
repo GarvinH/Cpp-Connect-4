@@ -12,12 +12,15 @@ void drawBoard(sf::RenderWindow *window, Game *game);
 void drawFinishedScreen(sf::RenderWindow *window, Game *game);
 
 bool clicked = false;
-bool finished = false;
+bool finished = true;
+bool lastRendered = false; // update the game one last time after finished
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(770, 770), "Connect 4");
+    sf::RenderWindow finishedWindow(sf::VideoMode(405, 200), "Connect 4 - Winner Screen");
     window.setFramerateLimit(60);
+    finishedWindow.setFramerateLimit(60);
 
     Game game;
 
@@ -27,19 +30,41 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+                finishedWindow.close();
+            }
+        }
+        while (finishedWindow.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+                finishedWindow.close();
+            }
         }
 
-        window.clear();
         if (!finished)
         {
+            window.clear();
             drawBoard(&window, &game);
+            window.display();
+            finishedWindow.setVisible(false);
         }
         else
         {
-            drawFinishedScreen(&window, &game);
+            if (!lastRendered)
+            {
+                window.clear();
+                drawBoard(&window, &game);
+                window.display();
+                lastRendered = true;
+            }
+            finishedWindow.setVisible(true);
+            finishedWindow.clear();
+            drawFinishedScreen(&finishedWindow, &game);
+            finishedWindow.display();
         }
-        window.display();
     }
 
     return 0;
@@ -76,7 +101,7 @@ void drawBoard(sf::RenderWindow *window, Game *game)
                 if (colBox.contains(sf::Mouse::getPosition(*window)))
                 {
                     // preview the chip if hovering over a column
-                    if ((game->board[i][0] == chip::Empty && k == 0) || (k > 0 && game->board[i][k - 1] != chip::Empty))
+                    if ((!finished) && ((game->board[i][0] == chip::Empty && k == 0) || (k > 0 && game->board[i][k - 1] != chip::Empty)))
                     {
                         sf::CircleShape previewChip(45);
                         previewChip.setPosition(chipX, 10);
@@ -162,19 +187,19 @@ void drawFinishedScreen(sf::RenderWindow *window, Game *game)
     winText.setString(winnerText);
     winText.setCharacterSize(20);
     winText.setFillColor(sf::Color::White);
-    winText.setPosition(325, 270);
+    winText.setPosition(145, 50);
     winText.setStyle(sf::Text::Bold);
 
-    sf::RectangleShape playAgainBox(sf::Vector2f(380, 80));
+    sf::RectangleShape playAgainBox(sf::Vector2f(365, 55));
     playAgainBox.setFillColor(sf::Color::Black);
     playAgainBox.setOutlineThickness(10);
-    playAgainBox.setPosition(195, 320);
+    playAgainBox.setPosition(20, 90);
 
     sf::Text playAgainText;
     playAgainText.setFont(font);
     playAgainText.setString("PLAY AGAIN");
     playAgainText.setCharacterSize(52);
-    playAgainText.setPosition(215, 325);
+    playAgainText.setPosition(35, 85);
     playAgainText.setStyle(sf::Text::Bold);
 
     sf::Rect playAgainButton(playAgainBox.getGlobalBounds());
@@ -189,6 +214,7 @@ void drawFinishedScreen(sf::RenderWindow *window, Game *game)
         {
             clicked = true;
             finished = false;
+            lastRendered = false;
             game->resetGame();
         }
         else if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
