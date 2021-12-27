@@ -12,7 +12,7 @@ void drawBoard(sf::RenderWindow *window, Game *game);
 void drawFinishedScreen(sf::RenderWindow *window, Game *game);
 
 bool clicked = false;
-bool finished = true;
+bool finished = false;
 bool lastRendered = false; // update the game one last time after finished
 
 int main()
@@ -53,17 +53,18 @@ int main()
         }
         else
         {
+            finishedWindow.setVisible(true);
+            finishedWindow.clear();
+            drawFinishedScreen(&finishedWindow, &game);
+            finishedWindow.display();
             if (!lastRendered)
             {
                 window.clear();
                 drawBoard(&window, &game);
                 window.display();
                 lastRendered = true;
+                finishedWindow.requestFocus();
             }
-            finishedWindow.setVisible(true);
-            finishedWindow.clear();
-            drawFinishedScreen(&finishedWindow, &game);
-            finishedWindow.display();
         }
     }
 
@@ -129,7 +130,8 @@ void drawBoard(sf::RenderWindow *window, Game *game)
                         if (move.success)
                         {
                             bool won = game->checkWin(move.col, move.row);
-                            if (!won)
+                            bool tied = game->isTied();
+                            if (!won && !tied)
                             {
                                 game->turn = static_cast<turn::Turn>((game->turn + 1) % (turn::Red + 1));
                             }
@@ -171,17 +173,23 @@ void drawFinishedScreen(sf::RenderWindow *window, Game *game)
 
     string winnerText = "";
 
-    switch (game->turn)
+    if (game->isTied())
     {
-    case (turn::Yellow):;
-        winnerText += "Yellow";
-        break;
-    case (turn::Red):
-        winnerText += "Red";
-        break;
-    };
+        winnerText += "Tied!";
+    }
+    else
+    {
 
-    winnerText += " won!";
+        switch (game->turn)
+        {
+        case (turn::Yellow):;
+            winnerText += "Yellow won!";
+            break;
+        case (turn::Red):
+            winnerText += "Red won!";
+            break;
+        };
+    }
 
     winText.setFont(font);
     winText.setString(winnerText);

@@ -33,6 +33,8 @@ Move Game::play(int col)
                 move.col = col;
                 move.row = i;
 
+                this->moves++;
+
                 return move;
             }
         }
@@ -158,4 +160,10 @@ void Game::resetGame()
             this->board[i][k] = chip::Empty;
         }
     }
+    this->moves = 0;
+}
+
+bool Game::isTied()
+{
+    return this->moves == 42;
 }
