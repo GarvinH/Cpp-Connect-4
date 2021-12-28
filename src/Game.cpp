@@ -110,7 +110,7 @@ bool Game::checkDiagonals(int col, int row)
         }
         for (int i = 0; i < 4; i++)
         {
-            if (colOffsetted + 1 > 6 || rowOffsetted + 1 > 5) //going out of bounds either upwards or rightwards
+            if (colOffsetted + i > 6 || rowOffsetted + i > 5) //going out of bounds either upwards or rightwards
             {
                 diagonal1 = false;
             }
@@ -133,7 +133,7 @@ bool Game::checkDiagonals(int col, int row)
         }
         for (int i = 0; i < 4; i++)
         {
-            if (colOffsetted + 1 > 6) //went to far right
+            if (colOffsetted + i > 6) //went to far right
             {
                 diagonal2 = false;
                 // don't need to check if going too far down because of vertical restriction
