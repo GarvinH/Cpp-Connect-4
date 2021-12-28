@@ -13,7 +13,6 @@ void drawFinishedScreen(sf::RenderWindow *window, Game *game);
 
 bool clicked = false;
 bool finished = false;
-bool lastRendered = false; // update the game one last time after finished
 
 int main()
 {
@@ -44,11 +43,11 @@ int main()
             }
         }
 
+        window.clear();
+        drawBoard(&window, &game);
+        window.display();
         if (!finished)
         {
-            window.clear();
-            drawBoard(&window, &game);
-            window.display();
             finishedWindow.setVisible(false);
         }
         else
@@ -57,14 +56,6 @@ int main()
             finishedWindow.clear();
             drawFinishedScreen(&finishedWindow, &game);
             finishedWindow.display();
-            if (!lastRendered)
-            {
-                window.clear();
-                drawBoard(&window, &game);
-                window.display();
-                lastRendered = true;
-                finishedWindow.requestFocus();
-            }
         }
     }
 
@@ -99,57 +90,55 @@ void drawBoard(sf::RenderWindow *window, Game *game)
                 shape.setFillColor(sf::Color::Red);
                 break;
             default:
-                if (colBox.contains(sf::Mouse::getPosition(*window)))
+                if (!finished)
                 {
-                    // preview the chip if hovering over a column
-                    if ((!finished) && ((game->board[i][0] == chip::Empty && k == 0) || (k > 0 && game->board[i][k - 1] != chip::Empty)))
+                    if (colBox.contains(sf::Mouse::getPosition(*window)))
                     {
-                        sf::CircleShape previewChip(45);
-                        previewChip.setPosition(chipX, 10);
-
-                        switch (game->turn)
+                        // preview the chip if hovering over a column
+                        if ((!finished) && ((game->board[i][0] == chip::Empty && k == 0) || (k > 0 && game->board[i][k - 1] != chip::Empty)))
                         {
-                        case (turn::Yellow):
-                            previewChip.setFillColor(sf::Color(255, 253, 150));
-                            break;
-                        case (turn::Red):
-                            previewChip.setFillColor(sf::Color(255, 105, 97));
-                            break;
+                            sf::CircleShape previewChip(45);
+                            previewChip.setPosition(chipX, 10);
+
+                            switch (game->turn)
+                            {
+                            case (turn::Yellow):
+                                previewChip.setFillColor(sf::Color(255, 253, 150));
+                                break;
+                            case (turn::Red):
+                                previewChip.setFillColor(sf::Color(255, 105, 97));
+                                break;
+                            }
+
+                            window->draw(previewChip);
                         }
 
-                        window->draw(previewChip);
-                    }
-
-                    shape.setFillColor(sf::Color::White);
-
-                    // checking for click
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clicked != sf::Mouse::isButtonPressed(sf::Mouse::Left))
-                    {
-                        clicked = true;
-                        Move move = game->play(i);
-                        if (move.success)
+                        // checking for click
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clicked != sf::Mouse::isButtonPressed(sf::Mouse::Left))
                         {
-                            bool won = game->checkWin(move.col, move.row);
-                            bool tied = game->isTied();
-                            if (!won && !tied)
+                            clicked = true;
+                            Move move = game->play(i);
+                            if (move.success)
                             {
-                                game->turn = static_cast<turn::Turn>((game->turn + 1) % (turn::Red + 1));
-                            }
-                            else
-                            {
-                                finished = true;
+                                bool won = game->checkWin(move.col, move.row);
+                                bool tied = game->isTied();
+                                if (!won && !tied)
+                                {
+                                    game->turn = static_cast<turn::Turn>((game->turn + 1) % (turn::Red + 1));
+                                }
+                                else
+                                {
+                                    finished = true;
+                                }
                             }
                         }
-                    }
-                    else if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
-                    {
-                        clicked = false;
+                        else if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                        {
+                            clicked = false;
+                        }
                     }
                 }
-                else
-                {
-                    shape.setFillColor(sf::Color::White);
-                }
+                shape.setFillColor(sf::Color::White);
                 break;
             };
 
@@ -222,7 +211,6 @@ void drawFinishedScreen(sf::RenderWindow *window, Game *game)
         {
             clicked = true;
             finished = false;
-            lastRendered = false;
             game->resetGame();
         }
         else if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))

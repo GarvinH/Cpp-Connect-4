@@ -94,60 +94,54 @@ bool Game::checkHorizontal(int col, int row)
 
 bool Game::checkDiagonals(int col, int row)
 {
-    if (row > 2) // same condition as vertical win
+
+    int colOffsetted = col; //temp int to see how far left we can go
+    int rowOffsetted = row; //temp int to see how far down/up we can go
+
+    //check diagonal bottom left to top right -----------------------------------------
+    //move as far bottom left as we can while remainig the same colour, then work up right
+    bool diagonal1 = true; //represents if this diagonal is a win
+    while (colOffsetted > 0 && rowOffsetted > 0 && this->board[colOffsetted - 1][rowOffsetted - 1] == this->board[col][row])
     {
-
-        int colOffsetted = col; //temp int to see how far left we can go
-        int rowOffsetted = row; //temp int to see how far down/up we can go
-
-        //check diagonal bottom left to top right -----------------------------------------
-        //move as far bottom left as we can while remainig the same colour, then work up right
-        bool diagonal1 = true; //represents if this diagonal is a win
-        while (colOffsetted > 0 && rowOffsetted > 0 && this->board[colOffsetted - 1][rowOffsetted - 1] == this->board[col][row])
+        colOffsetted--;
+        rowOffsetted--;
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if (colOffsetted + i > 6 || rowOffsetted + i > 5) //going out of bounds either upwards or rightwards
         {
-            colOffsetted--;
-            rowOffsetted--;
+            diagonal1 = false;
         }
-        for (int i = 0; i < 4; i++)
+        if (this->board[colOffsetted + i][rowOffsetted + i] != this->board[col][row])
         {
-            if (colOffsetted + i > 6 || rowOffsetted + i > 5) //going out of bounds either upwards or rightwards
-            {
-                diagonal1 = false;
-            }
-            if (this->board[colOffsetted + i][rowOffsetted + i] != this->board[col][row])
-            {
-                diagonal1 = false;
-            }
+            diagonal1 = false;
         }
-
-        //check diagonal top left to bottom right -----------------------------------------
-        colOffsetted = col; //reset
-        rowOffsetted = row; //reset
-
-        //move as far top left as possible while remaining the same color, then work bottom right
-        bool diagonal2 = true;
-        while (colOffsetted > 0 && rowOffsetted < 5 && this->board[colOffsetted - 1][rowOffsetted + 1] == this->board[col][row])
-        {
-            colOffsetted--;
-            rowOffsetted++;
-        }
-        for (int i = 0; i < 4; i++)
-        {
-            if (colOffsetted + i > 6) //went to far right
-            {
-                diagonal2 = false;
-                // don't need to check if going too far down because of vertical restriction
-            }
-            if (this->board[colOffsetted + i][rowOffsetted - i] != this->board[col][row])
-            {
-                diagonal2 = false;
-            }
-        }
-
-        return diagonal1 || diagonal2; //if either of the two are true, ther is a win
     }
 
-    return false;
+    //check diagonal top left to bottom right -----------------------------------------
+    colOffsetted = col; //reset
+    rowOffsetted = row; //reset
+
+    //move as far top left as possible while remaining the same color, then work bottom right
+    bool diagonal2 = true;
+    while (colOffsetted > 0 && rowOffsetted < 5 && this->board[colOffsetted - 1][rowOffsetted + 1] == this->board[col][row])
+    {
+        colOffsetted--;
+        rowOffsetted++;
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if (colOffsetted + i > 6 || rowOffsetted - i < 0) //went to far right or too far down
+        {
+            diagonal2 = false;
+        }
+        if (this->board[colOffsetted + i][rowOffsetted - i] != this->board[col][row])
+        {
+            diagonal2 = false;
+        }
+    }
+
+    return diagonal1 || diagonal2; //if either of the two are true, ther is a win
 }
 
 void Game::resetGame()
