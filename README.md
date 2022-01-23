@@ -2,6 +2,8 @@
 
 Local multiplayer (same computer) game of connect 4 built using c++
 
+![Connect 4 Screenshot](/assets/Connect4.png)
+
 ## Pre-requesites
 
 - C++
